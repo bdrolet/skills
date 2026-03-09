@@ -1,0 +1,12 @@
+---
+description: Do not create or reference Jira tickets for PRs in this repository.
+alwaysApply: true
+---
+
+# No Jira Tickets
+
+This repository does not use Jira for tracking. When opening PRs:
+
+- Do **not** create Jira tickets
+- Do **not** add ticket references to PR titles or descriptions
+- Skip any Jira-related steps in PR workflows
