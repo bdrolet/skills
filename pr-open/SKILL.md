@@ -160,16 +160,10 @@ It returns the final formatted markdown body ready to use in `gh pr create`.
 
 ## Phase 7: Link the PR to the Jira ticket
 
-If a Jira ticket was found or created in Phase 5, add the PR URL as a comment on the ticket so the two are cross-linked:
+If a Jira ticket was found or created in Phase 5, add the PR URL as a comment on the ticket so the two are cross-linked. Use the **Atlassian MCP** (`plugin-atlassian-atlassian`):
 
-```bash
-jira comment add <TICKET-KEY> $'PR opened: <PR-URL>'
-```
-
-Get the PR URL from the `gh pr create` output, or:
-```bash
-gh pr view --json url -q .url
-```
+- Get the PR URL from the `gh pr create` output, or: `gh pr view --json url -q .url`
+- Use `addCommentToJiraIssue` with `cloudId: "homewardhealth.atlassian.net"`, `issueIdOrKey: "<TICKET-KEY>"`, `commentBody: "PR opened: <PR-URL>"`, and `contentFormat: "markdown"`.
 
 If this step fails, it's non-critical — the PR title already contains the ticket key, so traceability isn't lost.
 

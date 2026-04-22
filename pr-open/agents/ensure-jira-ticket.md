@@ -22,11 +22,9 @@ If **a ticket is referenced**, go to Step 2.
 
 ## Step 2: Validate the referenced ticket
 
-Read the ticket using the `jira` CLI to see if it actually describes the work being done:
+Read the ticket using the **Atlassian MCP** (`plugin-atlassian-atlassian`) to see if it actually describes the work being done:
 
-```bash
-jira view <TICKET_KEY>
-```
+- Use `getJiraIssue` with `cloudId: "homewardhealth.atlassian.net"` and `issueIdOrKey: "<TICKET_KEY>"`.
 
 Compare the ticket's summary and description against the `changes_summary` and `pr_description`. Ask yourself: does this ticket describe the same piece of work?
 
@@ -61,18 +59,15 @@ Build the ticket content from the inputs:
 
   Derive acceptance criteria from what the PR actually does — if it adds an API endpoint, the criterion is that the endpoint works. If it changes config, the criterion is that the service runs correctly with the new config.
 
-Create the ticket:
+Create the ticket using the **Atlassian MCP** (`plugin-atlassian-atlassian`):
 
-```bash
-jira create \
-  --project <PROJECT_KEY> \
-  --issuetype Task \
-  --summary "<summary>" \
-  --noedit \
-  --override description=$'<description with \n for newlines>'
-```
+- Use `createJiraIssue` with `cloudId: "homewardhealth.atlassian.net"` and the following fields:
+  - `projectKey`: the `default_project_key`
+  - `issueType`: `"Task"` (or `"Bug"` if the changes are clearly a bug fix)
+  - `summary`: the concise title
+  - `description`: the structured description (markdown format with `contentFormat: "markdown"`)
 
-Verify the CLI returns `OK <KEY> <URL>`.
+Verify the response contains the issue key and URL.
 
 ## Output
 

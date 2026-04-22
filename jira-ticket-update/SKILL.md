@@ -32,6 +32,7 @@ arguments:
    - New description with bullets/acceptance criteria (if changing)
    - Labels/components to add/remove (optional)
    - Desired status transition (optional, e.g., `"In Progress"`, `"Done"`)
+   - Sprint name to assign to (optional, e.g., `"C2:26 Sprint 2"`)
 
 3. **Compose update text (example)**
    ```
@@ -69,11 +70,49 @@ arguments:
    jira transition ${ticketKey} --transition "In Progress"
    ```
 
-6. **Verify ticket**
+6. **(Optional) Assign to a sprint**
+
+   Use the script at `scripts/assign-sprint.sh` which handles board lookup, sprint matching, assignment, and verification:
+   ```bash
+   ./scripts/assign-sprint.sh ${ticketKey} "C2:26 Sprint 2"
+   ```
+
+   Or run the steps manually via `jira request` (which reuses the CLI's built-in auth):
+
+   **a. Find the scrum board ID for the project:**
+   ```bash
+   PROJECT_KEY=$(echo "${ticketKey}" | cut -d- -f1)
+   jira request -M GET "/rest/agile/1.0/board?projectKeyOrId=$PROJECT_KEY&type=scrum" \
+     | python3 -c "import json,sys; [print(f\"{v['id']}  {v['name']}\") for v in json.load(sys.stdin).get('values',[])]"
+   ```
+
+   **b. List active/future sprints on that board:**
+   ```bash
+   jira request -M GET "/rest/agile/1.0/board/<BOARD_ID>/sprint?state=active,future" \
+     | python3 -c "import json,sys; [print(f\"{s['id']}  {s['state']:<8}  {s['name']}\") for s in json.load(sys.stdin).get('values',[])]"
+   ```
+
+   **c. Move the issue to the sprint:**
+   ```bash
+   jira request -M POST "/rest/agile/1.0/sprint/<SPRINT_ID>/issue" '{"issues":["'${ticketKey}'"]}'
+   ```
+   An empty response means success.
+
+   **d. Verify:**
+   ```bash
+   jira request -M GET "/rest/agile/1.0/issue/${ticketKey}" --gjq "fields.sprint.name"
+   ```
+
+   **Known board IDs:**
+   | Project | Board Name | Board ID | Type |
+   |---------|-----------|----------|------|
+   | GENAI | AI Dev- Ex/Ops Sprint | 1700 | scrum |
+
+7. **Verify ticket**
    - Confirm CLI success and inspect ticket: `jira view ${ticketKey}` or `jira browse ${ticketKey}`
    - Ensure bullets/newlines render correctly.
 
-7. **If formatting is off**
+8. **If formatting is off**
    - Re-run `jira edit ${ticketKey} --noedit --override description=$'<new text with \\n>'`.
 
 ## Requirements

@@ -46,3 +46,37 @@ Guide to squash-merge the PR for the current branch with a clear, PR-linked comm
    - Confirm branch cleanup if desired: `gh pr merge ... --delete-branch` (optional) or `git branch -d "$BRANCH"` after pulling.
    - If merge failed, capture error output and retry after resolving blockers.
 
+8. **Update Jira ticket**
+
+   After a successful merge, find and resolve the associated Jira ticket using the **Atlassian MCP** (`plugin-atlassian-atlassian`).
+
+   **Find the ticket key.** Check these sources in order:
+   - PR title — the pr-open skill formats titles as `[TICKET-KEY]: description`, so extract the key from brackets.
+   - PR body — look for a `**Ticket:**` line or bare ticket keys (uppercase letters, hyphen, digits like `DEVOPS-123`).
+   - Commit messages on the PR.
+
+   ```bash
+   TICKET_KEY=$(gh pr view "$PR_NUMBER" --json title --jq '.title' | grep -oE '^\[[A-Z]+-[0-9]+\]' | tr -d '[]')
+   if [ -z "$TICKET_KEY" ]; then
+     TICKET_KEY=$(gh pr view "$PR_NUMBER" --json body --jq '.body' | grep -oE '[A-Z]+-[0-9]+' | head -1)
+   fi
+   ```
+
+   If no ticket key is found, skip this step.
+
+   **Verify the ticket exists and check its status** via MCP:
+   - Use `getJiraIssue` with `cloudId: "homewardhealth.atlassian.net"` and `issueIdOrKey: "<TICKET_KEY>"`.
+
+   **Determine if the PR completes the ticket's work.** Compare the ticket's summary/description against the PR's changes. The PR completes the ticket if the merged changes satisfy the work described in the ticket (the ticket doesn't need to describe every line — intent-level match is sufficient). If the PR is a partial contribution to a larger ticket, do **not** close it — add a comment instead.
+
+   **Transition the ticket to Done** if the PR completes the work:
+   - Use `getTransitionsForJiraIssue` to list available transitions and find the `Done` transition ID.
+   - Use `transitionJiraIssue` with the transition `id` to move the ticket to Done.
+   - If `Done` is not available, look for `Closed` or another terminal state.
+
+   **Add a comment** linking the merged PR:
+   - Get the PR URL: `gh pr view "$PR_NUMBER" --json url --jq .url`
+   - Use `addCommentToJiraIssue` with `commentBody: "Merged via PR: <PR_URL>"` and `contentFormat: "markdown"`.
+
+   If any Jira step fails, log the error but do not fail the overall merge — the PR is already merged and the title contains the ticket key for traceability.
+
