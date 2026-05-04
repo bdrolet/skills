@@ -73,6 +73,7 @@ arguments:
 
 5. **Output**
    - Save the result in the current directory using the same base name with a `.slack.md` suffix (e.g., `notes.md` → `notes.slack.md`).
+   - After saving, copy the file content to the clipboard: `pbcopy < notes.slack.md` (substitute the actual output filename).
    - Return Slack-ready text only (no extra wrappers) as the file content.
    - If content was summarized, note that it's a summary and offer to provide full detail if needed.
 
