@@ -233,6 +233,18 @@ Not migrated: rules with `alwaysApply: true` or specific `globs` patterns; user 
 
 ## Subagents in Skills
 
+### Named Subagent Patterns
+
+Three concrete signals that require subagents, with real examples:
+
+| Pattern | Signal | Example skill |
+|---------|--------|---------------|
+| **Fan-out** | 2+ independent steps that can run at the same time | `running-ci-checks` — typecheck, lint, unit-tests, build all spawn in parallel; wall-clock time drops from ~4× sequential to ~1× |
+| **Verbose isolation** | A step produces noisy output (logs, CLI stdout, diffs) the parent doesn't need in full | `terraform-plan` / `terraform-apply` — terraform output floods context; a subagent runs the command, parses it, and returns a structured summary. `deploy-inbox` — 3 independent `gcloud logging read` calls each return raw log lines; a subagent runs all 3 in parallel and returns a clean table |
+| **Model switching** | Different steps have different complexity needs | `reviewing-pr-code` — gather-context uses `fast` (mechanical API calls), analyze-code uses default (judgment), post-review uses `fast` (formatting) |
+
+**Decision rule:** if ANY pattern applies, the skill needs subagents. If none apply, inline steps are fine.
+
 ### Skill-Level Subagents (`agents/` directory)
 
 Skills can include an `agents/` directory containing markdown prompt files. These are **not** auto-discovered agent definitions — they are prompt templates that the skill's SKILL.md reads and dispatches via the Task tool at runtime.

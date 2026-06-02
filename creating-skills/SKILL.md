@@ -19,7 +19,7 @@ Skills are markdown packages that teach agents domain-specific tasks, following 
 | Structure | `SKILL.md` (required), optional `agents/`, `scripts/`, `references/`, `assets/` |
 | Storage | `~/.cursor/skills/` (global), `.cursor/skills/` or `.agents/skills/` (project). Never `~/.cursor/skills-cursor/` |
 | Dependencies | Reference existing skills by name, don't duplicate. Declare in `metadata.depends-on` |
-| Subagents | For parallel/pipeline workflows. Put prompts in `agents/`. Self-contained with typed Inputs and Output sections. Use `fast` model for simple gather/format tasks; default model for reasoning-heavy work |
+| Subagents | **Required when:** 2+ parallel steps, verbose output to isolate from main context, or steps need different models. Put prompts in `agents/`. Self-contained with typed Inputs and Output sections. `fast` for gather/format; default for reasoning |
 
 See [specification reference](references/specification.md) for all frontmatter fields and validation rules.
 
@@ -49,7 +49,7 @@ Gather from user (or infer from conversation context):
 2. Description: "Use when..." with specific triggers/symptoms — no workflow summary
 3. Plan body sections. Target <500 words
 4. Identify dependencies on other skills
-5. Decide if subagents are needed (parallel steps, verbose output, pipeline shape)
+5. **Use subagents** when any of these are true: 2+ steps can run simultaneously (fan-out); a step produces verbose output the parent doesn't need in full — logs, CLI output, diffs (isolation); steps need different models. See [subagent patterns](references/specification.md#named-subagent-patterns) for examples. If none apply, inline steps are fine.
 
 ### Phase 3: Implementation
 
@@ -67,4 +67,4 @@ Spawn the **validate-skill** subagent (`agents/validate-skill.md`). Read the age
 
 - [Specification reference](references/specification.md) — frontmatter fields, validation rules, anti-patterns, subagent details
 - [Complete examples](references/examples.md) — simple skill and skill-with-subagents
-- For TDD-based skill testing and bulletproofing, see writing-skills
+- For eval loops, benchmarking, and description optimization, see skill-creator
