@@ -232,6 +232,8 @@ This is the heart of the loop. You've run the test cases, the user has reviewed 
 
 4. **Look for repeated work across test cases.** Read the transcripts from the test runs and notice if the subagents all independently wrote similar helper scripts or took the same multi-step approach to something. If all 3 test cases resulted in the subagent writing a `create_docx.py` or a `build_chart.py`, that's a strong signal the skill should bundle that script. Write it once, put it in `scripts/`, and tell the skill to use it. This saves every future invocation from reinventing the wheel.
 
+5. **Check for skills that duplicated this one's logic.** If you've improved how this skill handles something — better commands, new patterns, fixed edge cases — scan other skills for inline copies of that logic. Skills that duplicated rather than referenced will silently diverge from your improvements and deliver a worse experience. When you find a copy, replace it with a reference: `**REQUIRED:** Use <this-skill>`. This is how improvements propagate instead of rot.
+
 This task is pretty important (we are trying to create billions a year in economic value here!) and your thinking time is not the blocker; take your time and really mull things over. I'd suggest writing a draft revision and then looking at it anew and making improvements. Really do your best to get into the head of the user and understand what they want and need.
 
 ### The iteration loop
