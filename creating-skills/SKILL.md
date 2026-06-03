@@ -19,7 +19,7 @@ Skills are markdown packages that teach agents domain-specific tasks, following 
 | Structure | `SKILL.md` (required), optional `agents/`, `scripts/`, `references/`, `assets/` |
 | Storage | `~/.cursor/skills/` (global), `.cursor/skills/` or `.agents/skills/` (project). Never `~/.cursor/skills-cursor/` |
 | Dependencies | Reference existing skills by name, don't duplicate. Declare in `metadata.depends-on` |
-| Subagents | **Required when:** 2+ parallel steps, verbose output to isolate from main context, or steps need different models. Put prompts in `agents/`. Self-contained with typed Inputs and Output sections. `fast` for gather/format; default for reasoning |
+| Subagents | Default to subagents for any bounded step whose intermediate context the parent doesn't need — bash output, log reads, reviews, data fetches. Inline only when the parent needs the full output to proceed. Put prompts in `agents/`. `fast` for gather/format; default for reasoning |
 
 See [specification reference](references/specification.md) for all frontmatter fields and validation rules.
 
@@ -33,6 +33,7 @@ See [specification reference](references/specification.md) for all frontmatter f
 | Name doesn't match directory | `name` field must exactly equal parent directory name |
 | Vague name (`helper`, `utils`) | Use specific gerunds: `processing-pdfs`, `deploying-apps` |
 | Subagent assumes parent context | Subagents are isolated. Document all inputs explicitly |
+| Inline steps that say "run in parallel" | That's a subagent. Move the steps to `agents/` — describing parallelism in prose means you need an agents/ file |
 
 ## Workflow
 
@@ -49,7 +50,7 @@ Gather from user (or infer from conversation context):
 2. Description: "Use when..." with specific triggers/symptoms — no workflow summary
 3. Plan body sections. Target <500 words
 4. Identify dependencies on other skills
-5. **Use subagents** when any of these are true: 2+ steps can run simultaneously (fan-out); a step produces verbose output the parent doesn't need in full — logs, CLI output, diffs (isolation); steps need different models. See [subagent patterns](references/specification.md#named-subagent-patterns) for examples. If none apply, inline steps are fine.
+5. **Default to subagents** for any bounded step whose intermediate context the parent won't need — bash commands, log reads, text review, data fetches. The subagent absorbs the noise and returns only what matters. Common patterns: parallel fan-out, verbose output isolation, model switching. See [subagent patterns](references/specification.md#named-subagent-patterns). Inline only when the parent needs the full output to proceed.
 
 ### Phase 3: Implementation
 
