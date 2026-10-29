@@ -32,6 +32,18 @@ Ben's voice: plain words, short declaratives, no corporate polish.
 Shape: 120–220 words, one idea per paragraph, 1–2 sentences each; one short
 `–` list at most.
 
+If the article names the **Battened Down** framework, the post names it too,
+in one line, the way the article does ("battened-down AI", the harbor image).
+It is the consulting signature; a share that drops it loses the brand. Past
+work reads as consulting work ("a platform I built for a healthcare team"),
+never as a previous job.
+
+## Delivery
+
+Put the text on the clipboard in one Bash call, quoted heredoc so nothing
+expands (`pbcopy <<'EOF_MSG' … EOF_MSG`), then show it so Ben reads it before
+he posts. **Never post it, never type it into LinkedIn.** Ben posts.
+
 ## Delivery line (always include after the text)
 
 One line: **when** (Tue–Thu, 7–9 am in the audience's time zone; never
